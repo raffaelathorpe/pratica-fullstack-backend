@@ -10,7 +10,29 @@ const feiticoRoutes = require("./routes/feiticoRoutes");
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  'https://grimorioarcanor.netlify.app'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+  credentials: true, 
+  optionsSuccessStatus: 200 
+};
+
+
+app.use(cors(corsOptions));
+
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
