@@ -1,8 +1,10 @@
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const dns = require("dns");
 const userRoutes = require("./routes/userRoutes");
 const feiticoRoutes = require("./routes/feiticoRoutes");
 
@@ -12,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ mensagem: "API de usuários funcionando" });
+  res.json({ mensagem: "API funcionando" });
 });
 
 app.use("/usuarios", userRoutes);
@@ -21,8 +23,6 @@ app.use("/feiticos", feiticoRoutes);
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/crud_usuarios";
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 mongoose
   .connect(MONGODB_URI)
