@@ -1,58 +1,37 @@
-const dns = require("dns");
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
 
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const userRoutes = require("./routes/userRoutes");
-const feiticoRoutes = require("./routes/feiticoRoutes");
+const feiticoRoutes = require('./routes/feiticoRoutes');
 
 const app = express();
 
-const allowedOrigins = [
-  'https://grimorioarcanor.netlify.app'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-  credentials: true, 
-  optionsSuccessStatus: 200 
-};
-
-
-app.use(cors(corsOptions));
-
-
+app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.json({ mensagem: "API funcionando" });
+app.get('/', (req, res) => {
+  res.json({ mensagem: 'API do Grimório Arcano funcionando!' });
 });
 
-app.use("/usuarios", userRoutes);
-app.use("/feiticos", feiticoRoutes);
+app.use('/feiticos', feiticoRoutes);
 
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/crud_usuarios";
+const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose
-  .connect(MONGODB_URI)
+if (!MONGODB_URI) {
+  console.error('ERRO: A variável de ambiente MONGODB_URI não está definida.');
+  process.exit(1);
+}
+
+mongoose.connect(MONGODB_URI)
   .then(() => {
+    console.log('Conectado ao MongoDB com sucesso!');
     app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}`);
+      console.log(`Servidor rodando na porta ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error("Erro ao conectar ao MongoDB:", error.message);
+    console.error('Erro ao conectar ao MongoDB:', error.message);
+    process.exit(1);
   });
